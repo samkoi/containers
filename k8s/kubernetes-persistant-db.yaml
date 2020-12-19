@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: beverage-db-pv
+  labels:
+    stage: beverage
+spec:
+  storageClassName: db-storage
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 1Gi
+  hostPath:
+    path: /mnt/data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: beverage-db-pvc
+spec:
+  storageClassName: db-storage
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 0.5Gi          # less then the PV, otherwise the mapping is not successfull

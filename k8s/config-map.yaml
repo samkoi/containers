@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: beverage-config
+  namespace: default
+data:
+  serverUri_customer: http://localhost:9999/v1
+  service_name_customer: beverage
+  serverUri_management: http://localhost:9999/v1
+  service_name_management: management
+  serverUri_db: http://db:9999/v1
+  service_name_db: dbhandler

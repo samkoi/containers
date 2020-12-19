@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: beverage-d-m
+  labels:
+    app: beverage-m
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app:  beverage-m
+  template:
+    metadata:
+      labels:
+        app:  beverage-m
+    spec:
+      containers:
+        - name: beverage-man
+          image: beverageservice_managementservice:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 9999
+          # Readiness and Liveness can be configured here.
+          # Since the time delay depends a lot on the machine we are running in,
+          # it was difficult to set appropriate time for various environment during development
+          # and hence commented out.
+          # However, our application supports health check
+#          readinessProbe:
+#            httpGet:
+#              host: localhost
+#              path: /ready
+#              port: 8090
+#            initialDelaySeconds: 30
+#            periodSeconds: 15
+#            timeoutSeconds: 15
+#            failureThreshold: 1
+#          livenessProbe:
+#            httpGet:
+#              host: localhost
+#              path: /live
+#              port: 8090
+#            initialDelaySeconds: 30
+#            periodSeconds: 15
+#            timeoutSeconds: 15
+#            failureThreshold: 3
+          resources:
+            limits:
+              cpu: 0.1
+              memory: "400Mi"
+          env:
+            - name: SERVICE
+              valueFrom:
+                configMapKeyRef:
+                  name: beverage-config       # name of the config map
+                  key: service_name_management
+            - name: SERVER_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: beverage-config       # name of the config map
+                  key: serverUri_management

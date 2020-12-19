@@ -1,0 +1,402 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "Beveage Service",
+    "version": "1.0",
+    "description": "Summer is coming and we are all looking forward to having a barbecue with friends.\nFor a nice barbecue, we also need some refreshing drinks. Therefore, we want to start a\nnew business where we sell beverages and deliver them to people.\n",
+    "contact": {
+      "name": "Group 9"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080/v1",
+      "description": "Development Server"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "BottleDTO": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "price": {
+            "type": "number"
+          },
+          "inStock": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "volume": {
+            "type": "number"
+          },
+          "isAlcoholic": {
+            "type": "boolean"
+          },
+          "volumePercent": {
+            "type": "number"
+          },
+          "supplier": {
+            "type": "string"
+          }
+        },
+        "xml": {
+          "name": "Bottle"
+        }
+      },
+      "CrateDTO": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "price": {
+            "type": "number"
+          },
+          "inStock": {
+            "type": "boolean"
+          },
+          "Bottle": {
+            "$ref": "#/components/schemas/BottleDTO"
+          },
+          "noOfBottles": {
+            "type": "number"
+          }
+        },
+        "xml": {
+          "name": "Bottle"
+        }
+      },
+      "errorMessage": {
+        "type": "object",
+        "required": [
+          "errorType"
+        ],
+        "properties": {
+          "errorType": {
+            "description": "error category, should be extended",
+            "enum": [
+              "INVALID_PARAMETER"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "description": "A detailed error description"
+          }
+        }
+      },
+      "pagination": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number"
+          },
+          "noOfPages": {
+            "type": "number"
+          },
+          "first": {
+            "type": "string"
+          },
+          "previous": {
+            "type": "string"
+          },
+          "next": {
+            "type": "string"
+          },
+          "last": {
+            "type": "string"
+          }
+        }
+      },
+      "paginatedBeverages": {
+        "type": "object",
+        "properties": {
+          "pagination": {
+            "$ref": "#/components/schemas/pagination"
+          },
+          "beverages": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/BottleDTO"
+                },
+                {
+                  "$ref": "#/components/schemas/CrateDTO"
+                }
+              ]
+            }
+          },
+          "href": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/beverage": {
+      "description": "A catalog of all beverages",
+      "get": {
+        "tags": [
+          "GET"
+        ],
+        "summary": "Get beverage on a specific page",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageLimit",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "default": 10
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "simple string contains search [not case sensitive]",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "description": "The filter/sort function you want to apply",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "MaxPrice",
+                "MinPrice",
+                "Alcoholic",
+                "VolumePercent"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "beverages on the page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/paginatedBeverages"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "A bad request initiated by the user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/beverage/bottle/": {
+      "description": "A catalog of all bottles",
+      "get": {
+        "tags": [
+          "GET"
+        ],
+        "summary": "Get bottles on a specific page",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageLimit",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "bottles on the page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/paginatedBeverages"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "A bad request initiated by the user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/beverage/bottle/{bottleId}": {
+      "parameters": [
+        {
+          "name": "bottleId",
+          "required": true,
+          "in": "path",
+          "schema": {
+            "type": "number"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "GET"
+        ],
+        "summary": "Get a single bottle by id",
+        "responses": {
+          "200": {
+            "description": "get a specific bottle description",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BottleDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "A bad request initiated by the user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/beverage/crate/": {
+      "description": "A catalog of all crates",
+      "get": {
+        "tags": [
+          "GET"
+        ],
+        "summary": "Get bottles on a specific page",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageLimit",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "crates on the page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/paginatedBeverages"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "A bad request initiated by the user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/beverage/crate/{crateId}": {
+      "parameters": [
+        {
+          "name": "crateId",
+          "required": true,
+          "in": "path",
+          "schema": {
+            "type": "number"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "GET"
+        ],
+        "summary": "Get a single crate by id",
+        "responses": {
+          "200": {
+            "description": "get a specific crate description",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CrateDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "A bad request initiated by the user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

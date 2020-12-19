@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: db-d
+  labels:
+    app: db
+spec:
+  volumes:
+    - name: beverage-storage
+      persistentVolumeClaim:
+        claimName: beverage-db-pvc
+  containers:
+    - name: db
+      image: beverageservice_db:latest
+      imagePullPolicy: IfNotPresent
+      ports:
+        - containerPort: 9999
+      resources:
+        limits:
+          cpu: 0.1
+          memory: "400Mi"
+      stdin: true
+      tty: true
+      volumeMounts:
+        - name: beverage-storage
+          mountPath: /root/dev/BeverageService
+      env:
+        - name: SERVICE
+          valueFrom:
+            configMapKeyRef:
+              name: beverage-config       # name of the config map
+              key: service_name_db
+        - name: SERVER_URI
+          valueFrom:
+            configMapKeyRef:
+              name: beverage-config       # name of the config map
+              key: serverUri_db
